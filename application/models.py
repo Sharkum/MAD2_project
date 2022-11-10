@@ -1,10 +1,11 @@
 from sqlalchemy import ForeignKey
 from .database import db
+from sqlalchemy.orm import declarative_base, relationship
 
 class Logs(db.Model):
     __tablename__ = 'Logs'
     LogID = db.Column(db.Integer, autoincrement= True, primary_key=True)
-    UserName = db.Column(db.String, nullable=False)
+    UserName = db.Column(db.String, ForeignKey('User.UserName'), nullable=False)
     Tracker_name = db.Column(db.String, nullable=False)
     Date_created = db.Column(db.String, nullable=False)
     Last_modified = db.Column(db.String, nullable=False)
@@ -22,3 +23,5 @@ class User(db.Model):
     __tablename__ = 'User'
     UserName = db.Column(db.String, nullable=False, unique=True, primary_key=True)
     Password = db.Column(db.String, nullable=False)
+
+    logs = relationship('Logs')
