@@ -15,5 +15,6 @@ app.app_context().push()
 
 from application.controllers import *
 
+
 if __name__ == "__main__":
     app.run(debug = True)
