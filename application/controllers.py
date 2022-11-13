@@ -49,7 +49,7 @@ def signup():
         db.session.commit()
         return redirect('/'+request.form.get('cname') + '/lists')
 
-@app.route('/<string:UserName>/trackers', methods = ['GET'])
+@app.route('/<string:UserName>/lists', methods = ['GET'])
 def userpage(UserName):
     if request.method == 'GET' :
         all_trackers =  Lists.query.filter(Lists.UserName == UserName).all()

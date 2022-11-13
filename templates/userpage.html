@@ -1,39 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title> Active Trackers of {{name}}</title>
-    <link href="/static/css/main.min.css" rel="stylesheet" >
+    <title> Lists of {{name}}</title>
+    <link href="/static/css/main.css" rel="stylesheet" >
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
+
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg p-1">
-        <form action="/" method="GET" class="navbar-form">
-            <input type="submit" value="Logout" class="btn btn-primary fw-bold text-decoration-none"/>
-        </form>
-    </nav>
-    <h1 class="text-center">Trackers</h1>
-    <table class="table table-dark text-center">
-        <tr>
-            <th>Tracker</th>
-            <th>Status</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-        {%for i in tracker_list %}
-        <tr>
-            <td><a href='/{{name}}/{{i.Tracker_name}}/logs'>{{i.Tracker_name}}</a></td>
-            {% if i.Active > 0 %}
-            <td>Active</td>
-            {% else %}
-            <td>Inactive</td>
-            {% endif %}
-            <td>{{i.Description}}</td>
-            <td><a href='/{{name}}/{{i.Tracker_name}}/edit'>Edit</a> <br> <a href='/{{name}}/{{i.Tracker_name}}/delete'>Delete</a></td>
-        </tr>
-        {%endfor%}
-    </table>
-
-    <form action='/{{name}}/add' class="text-center">
-        <input type="submit" value="Add a new Tracker" class="btn btn-primary mb-3 text-center"/>
-    </form>
+    <div class="row p-3" id="app">
+        <p>
+            ${msg}
+        </p>
+        <list class="col p-3 bg-black" id="list-1" >
+            <card id="card-1" draggable="true">
+                <p>card no 1</p>
+            </card>
+        </list>
+        <list class="col p-3 bg-black" id="list-2" >
+            <card id="card-2" draggable="true">
+               <p>card no 2</p>
+            </card>
+        </list>
+    </div>
 </body>
+<script type="text/javascript" src = "{{ url_for('static',filename='vue/vue.js')}}"></script>
 </html>
