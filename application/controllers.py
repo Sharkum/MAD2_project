@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from flask import Flask,request,render_template,redirect, url_for
 from flask import current_app as app
 from .models import *
-    
+
 # code to prevent the app from loading cached images/data and always load only the supplied data.
 @app.context_processor
 def override_url_for():
@@ -52,22 +52,27 @@ def signup():
 @app.route('/<string:UserName>/lists', methods = ['GET'])
 def userpage(UserName):
     if request.method == 'GET' :
-        all_trackers =  Lists.query.filter(Lists.UserName == UserName).all()
+        all_cards = Cards.query.filter(Cards.UserName == UserName).all()
+        list_dic={}
+        for card in all_cards:
+            if card.List_name not in list_dic.keys():
+                list_dic[card.List_name] = []
+            list_dic[card.List_name].append(card)
 
-        return render_template('userpage.html',name= UserName, tracker_list = all_trackers)
+        return render_template('userpage.html',name= UserName, lists = list_dic.items())
 
-# @app.route('/<string:Username>/add', methods=['GET', 'POST'])
-# def list_add(Username):
-#     if request.method == 'GET':
-#         return render_template('list_add.html', name = Username)
-#     if request.method == 'POST':
-#         tracker_name = request.form.get('tracker_name')
-#         tracker_desc = request.form.get('tracker_desc')
-#         new_tracker = Lists(UserName = Username, Tracker_name = tracker_name,\
-#                                 Description = tracker_desc, Active = 0)
-#         db.session.add(new_tracker)
-#         db.session.commit()
-#         return redirect('/'+ Username +'/'+tracker_name+'/logs')
+@app.route('/<string:Username>/add', methods=['GET', 'POST'])
+def list_add(Username):
+    if request.method == 'GET':
+        return render_template('list_add.html', name = Username)
+    if request.method == 'POST':
+        tracker_name = request.form.get('tracker_name')
+        tracker_desc = request.form.get('tracker_desc')
+        new_tracker = Lists(UserName = Username, Tracker_name = tracker_name,\
+                                Description = tracker_desc, Active = 0)
+        db.session.add(new_tracker)
+        db.session.commit()
+        return redirect('/'+ Username +'/'+tracker_name+'/logs')
 
 # @app.route('/<string:UserName>/<string:Tracker_name>/edit', methods=['GET', 'POST'])
 # def tracker_edit(UserName, Tracker_name):
