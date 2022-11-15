@@ -7,21 +7,73 @@
 
 </head>
 <body>
-    <div class="row p-3" id="app">
-        <p>
-            ${msg}
-        </p>
-        <list class="col p-3 bg-black" id="list-1" >
-            <card id="card-1" draggable="true">
-                <p>card no 1</p>
+    <div class="container" id="app">
+        <div class="row p-3">
+            <div class="col">
+                hello
+            </div>
+            <div class="col text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createlist">
+                    Add list
+                </button>
+
+                <div class="modal fade" id="createlist" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/{{name}}/add" method="POST" id="list_add" class="container px-5 text-center">
+                                <div class="mb-3 row justify-content-center">
+                                    <label class="display-4 col-sm-2 col-form-label text-lg-end">Value</label>
+                                    <div class="col-3">
+                                        <input type="number" step="any" name="value" class="form-control" required />
+                                    </div>
+                                    <div class="col-2"></div>
+                                </div>
+                                <div class="mb-3 row justify-content-center">
+                                    <label class="display-4 col-sm-2 col-form-label text-lg-end">Description</label>
+                                    <div class="col-3">
+                                        <input type="text" name="desc" class="form-control"/>
+                                    </div>
+                                    <div class="col-2"></div>
+                                </div>
+                                <div class="py-3 text-center">
+                                    <input type="submit" value = "Submit" class="btn btn-primary mb-3">
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <main class="row p-3">
+        {%for list in lists%}
+        <list class="col p-3 border bg-light" id="list-{{list[0]}}" >
+            {%for card in list[1]%}
+            <card class="w-75 mx-auto text-center" id="card-{{card.CardID}}" draggable="true">
+                <p>{{card.CardID}}<br>
+                    {{card.Date_created}}<br>
+                    {{card.Last_modified}}<br>
+                    {{card.Deadline}}<br>
+                    {{card.Date_completed}}<br>
+                    {{card.Value}}
+                </p>
             </card>
+            {%endfor%}
         </list>
-        <list class="col p-3 bg-black" id="list-2" >
-            <card id="card-2" draggable="true">
-               <p>card no 2</p>
-            </card>
-        </list>
+        {%endfor%}
+    </main>
+    
     </div>
 </body>
 <script type="text/javascript" src = "{{ url_for('static',filename='vue/vue.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
 </html>
