@@ -1,6 +1,7 @@
 from sqlalchemy import ForeignKey
 from .database import db
 from sqlalchemy.orm import declarative_base, relationship
+from flask_security import UserMixin
 
 class Cards(db.Model):
     __tablename__ = 'Cards'
