@@ -17,15 +17,15 @@
 <body class="container">
     
     <h1 class="text-center fw-bold display-1">Trackiphy</h1>
-<form action="/" method="POST" id="login">
-    <div>
-        <label >Username</label>
-        <input type="text" name='name'  required />
+<form action="/login" method="POST" id="login">
+    <div class="container mb-3 col-6 text-center">
+        <label class="form-label display-6">Username:</label>
+        <input type='text' name='username' class="form-control" required />
     </div>
 
-    <div >
-        <label >Password</label>
-        <input type="password" name="pass" required />
+    <div class="container mb-3 col-6 text-center"> 
+        <label class="form-label display-6">Password</label>
+        <input type="password" name="password" class="form-control" required />
     </div>
 
     <div class="row-auto text-center">
@@ -38,5 +38,5 @@
     <p class="text-center text-danger"> There are no accounts with this Username, please signup.</p>
     {% endif %}
 </form>
-<p class="text-center">Don't have an account? <a href = '/signup'>Sign up</a></p>
+<p class="text-center">Don't have an account? <a href = '/register'>Sign up</a></p>
 </body>

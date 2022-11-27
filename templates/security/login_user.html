@@ -1,0 +1,39 @@
+{% extends "security/base.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field, render_field_errors, render_form_errors %}
+
+{% block content %}
+{% include "security/_messages.html" %}
+<h1 class="text-center fw-bold display-1">Kanban v2</h1>
+  <form action="/login" method="POST" name="login_user_form">
+    <div class="container mb-3 col-6 text-center display-6">
+    {{ login_user_form.hidden_tag() }}
+    {{ render_form_errors(login_user_form) }}
+    {% if "email" in identity_attributes %}
+      {{ render_field_with_errors(login_user_form.email,class="form-control",type="email") }}
+    {% endif %}
+    </div>
+    <div class="container mb-3 col-6 text-center display-6">
+      {{ render_field_with_errors(login_user_form.password,class="form-control",type="password") }}
+    </div>
+    <div class="container mb-3 col-6 text-center ">
+    {{ render_field_with_errors(login_user_form.remember,class="form-check-input") }}
+    </div>
+    <div class="container mb-3 col-6 text-center">
+    {{ render_field_errors(login_user_form.csrf_token) }}
+    </div>
+    <div class="row-auto text-center">
+    {{ render_field(login_user_form.submit,class="btn btn-primary mb-3") }}
+    </div>
+  </form>
+  {% if security.webauthn %}
+    <hr class="fs-gap">
+    <h2>{{ _fsdomain("Use WebAuthn to Sign In") }}</h2>
+    <div>
+      <form method="GET" id="wan-signin-form" name="wan_signin_form">
+        <input id="wan_signin" name="wan_signin" type="submit" value="{{ _fsdomain('Sign in with WebAuthn') }}"
+          formaction="{{ url_for_security("wan_signin") }}">
+      </form>
+    </div>
+  {% endif %}
+  <p class="text-center">Don't have an account? <a href = '/register'>Sign up</a></p>
+{% endblock %}

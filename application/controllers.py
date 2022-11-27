@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from flask import Flask,request,render_template,redirect, url_for
 from flask import current_app as app
 from .models import *
+import flask_login
 
 # code to prevent the app from loading cached images/data and always load only the supplied data.
 @app.context_processor
@@ -20,39 +21,41 @@ def dated_url_for(endpoint, **values):
             values['q'] = int(os.stat(file_path).st_mtime)
     return url_for(endpoint, **values)
 
-# Login page
-@app.route('/', methods= ['GET','POST'])
-def login():
-    if request.method == 'GET':
-        return render_template('login.html', fail=False)
-    if request.method == 'POST':
-        UserName = request.form.get('name')
-        password = request.form.get('pass')
-        user_entry = User.query.filter(User.UserName == UserName).first()
-        if not user_entry:
-            return render_template('login.html',user_not_found = True, fail=False)
-        else:
-            if(user_entry.Password == password):
-                return redirect('/'+UserName+'/lists')
-            else:
-                return render_template('login.html', user_not_found=False, fail=True)
+# # Login page
+# @app.route('/login', methods= ['GET','POST'])
+# def login():
+#     if request.method == 'GET':
+#         return render_template('login.html', fail=False)
+#     if request.method == 'POST':
+#         email = request.form.get('name')
+#         password = request.form.get('pass')
+#         user_entry = User.query.filter(User.UserName == UserName).first()
+#         if not user_entry:
+#             return render_template('login.html',user_not_found = True, fail=False)
+#         else:
+#             if(user_entry.Password == password):
+#                 return redirect('/'+UserName+'/lists')
+#             else:
+#                 return render_template('login.html', user_not_found=False, fail=True)
 
-# Signup page
-@app.route('/signup', methods=['GET','POST'])
-def signup():  
-    if request.method == 'GET':
-        return render_template('signup.html')
-    if request.method == 'POST':
-        fs_uniquifier = ''.join(random.choice(string.ascii_letters) for i in range(8))
-        new_entry = User(UserName =  request.form.get('cname'), Password = request.form.get('cpass'),fs_uniquifier=fs_uniquifier)
-        db.session.add(new_entry)
-        db.session.commit()
-        return redirect('/'+request.form.get('cname') + '/lists')
+# # Signup page
+# @app.route('/signup', methods=['GET','POST'])
+# def signup():  
+#     if request.method == 'GET':
+#         return render_template('signup.html')
+#     if request.method == 'POST':
+#         fs_uniquifier = ''.join(random.choice(string.ascii_letters) for i in range(8))
+#         new_entry = User(UserName =  request.form.get('cname'), Password = request.form.get('cpass'),fs_uniquifier=fs_uniquifier)
+#         db.session.add(new_entry)
+#         db.session.commit()
+#         return redirect('/'+request.form.get('cname') + '/lists')
 
-@app.route('/<string:UserName>/lists', methods = ['GET'])
-def userpage(UserName):
+@app.route('/lists', methods = ['GET'])
+def userpage():
     if request.method == 'GET' :
-        all_cards = Cards.query.filter(Cards.UserName == UserName).all()
+        curr_user = flask_login.current_user
+        curr_lists = curr_user.lists
+        print(curr_lists)
         list_dic={}
         for card in all_cards:
             if card.List_name not in list_dic.keys():
@@ -61,8 +64,8 @@ def userpage(UserName):
 
         return render_template('userpage.html',name= UserName, lists = list_dic.items())
 
-@app.route('/<string:Username>/add', methods=['GET', 'POST'])
-def list_add(Username):
+@app.route('/add', methods=['GET', 'POST'])
+def list_add():
     if request.method == 'GET':
         return render_template('list_add.html', name = Username)
     if request.method == 'POST':

@@ -1,4 +1,3 @@
-from distutils.debug import DEBUG
 import os
 
 import sqlalchemy
@@ -13,5 +12,12 @@ class Config():
 
 class LocalDevelopmentConfig(Config):
     SQLITE_DB_DIR = os.path.join(basedir,"../db_directory")
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(SQLITE_DB_DIR,"database.sqlite3")
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.sqlite3'
     DEBUG = True 
+    SECRET_KEY = "5ls3k26nv35lvci25"
+    SECURITY_PASSWORD_HASH = "bcrypt"
+    SECURITY_PASSWORD_SALT = "asdlj236mfg90al"
+    SECURITY_REGISTERABLE = True
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SECURITY_UNAUTHORIZED_VIEW = None
+    SECURITY_USERNAME_ENABLE = True

@@ -12,15 +12,19 @@
         </form>
     </nav>   
     <h1 class="text-center fw-bold display-4"> Signup</h1>
-    <form action="/signup" method="POST" id="signup">
+    <form action="/register" method="POST" id="register">
+        <div class="container mb-3 col-6 text-center">
+            <label class="form-label display-6">Email:</label>
+            <input type='text' name='email' class="form-control" required />
+        </div>
         <div class="container mb-3 col-6 text-center">
             <label class="form-label display-6">Username:</label>
-            <input type='text' name='cname' class="form-control" required />
+            <input type='text' name='username' class="form-control" required />
         </div>
     
         <div class="container mb-3 col-6 text-center"> 
             <label class="form-label display-6">Password</label>
-            <input type="password" name="cpass" class="form-control" required />
+            <input type="password" name="password" class="form-control" required />
         </div>
         
         <div class="col-auto text-center">
