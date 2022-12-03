@@ -1,11 +1,12 @@
 from .database import db
 from sqlalchemy.orm import declarative_base, relationship
 from flask_security import UserMixin,RoleMixin
+import datetime
 
 class Cards(db.Model):
     __tablename__ = 'Cards'
     CardID = db.Column(db.Integer, autoincrement= True, primary_key=True,nullable=False)
-    ListID = db.Column(db.Integer,primary_key=True, nullable=False,autoincrement= True)
+    ListID = db.Column(db.Integer,primary_key=True, nullable=False)
     Date_created = db.Column(db.TIMESTAMP, nullable=False)
     Last_modified = db.Column(db.TIMESTAMP, nullable=False)
     Deadline = db.Column(db.TIMESTAMP,  nullable=False)
@@ -13,6 +14,15 @@ class Cards(db.Model):
     Value = db.Column(db.Integer, nullable = False)
     Description = db.Column(db.String, nullable = True)
     lists = db.relationship('Lists',secondary='Cardlists', backref=db.backref('cards',lazy='dynamic'))
+    
+    def as_dict(self):
+        dic = {}
+        for c in self.__table__.columns:
+            attr = getattr(self,c.name)
+            if isinstance(attr,datetime.datetime):
+                attr = attr.strftime("%Y-%m-%dT%H:%M")
+            dic[c.name]=attr
+        return dic
 
 class Cardlists(db.Model):
     __tablename__ = 'Cardlists'
@@ -25,6 +35,9 @@ class Lists(db.Model):
     List_name = db.Column(db.String, nullable=False, primary_key=True)
     Description = db.Column(db.String)
     users = db.relationship('User',secondary='Listusers', backref=db.backref('lists',lazy='dynamic'))
+    
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 class Listusers(db.Model):
     __tablename__ = 'Listusers'
@@ -40,6 +53,9 @@ class User(db.Model,UserMixin):
     active = db.Column(db.Boolean())
     fs_uniquifier = db.Column(db.String,unique=True, nullable=False)
     roles= db.relationship('Role',secondary="role_users",backref=db.backref('users',lazy='dynamic'))
+    
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
      
 class role_users(db.Model):
     __tablename__ = 'role_users'

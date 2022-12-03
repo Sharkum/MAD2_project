@@ -8,6 +8,7 @@ class Config():
     SQLITE_DB_DIR = None
     SQLALCHEMY_DATABASE_URI = None
     SQLALCHEMY_TRACK_MODIFICATIONS = False 
+    WTF_CSRF_ENABLED = False
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
 
 class LocalDevelopmentConfig(Config):

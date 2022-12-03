@@ -1,12 +1,14 @@
+import json
 import datetime , calendar , os, string,random
 from distutils.log import Log
 from sqlalchemy import extract,func
 import numpy as np
 import matplotlib.pyplot as plt
-from flask import Flask,request,render_template,redirect, url_for
+from flask import Flask,request,render_template,redirect, url_for,jsonify
 from flask import current_app as app
 from .models import *
 import flask_login
+from flask_login import login_required
 
 # code to prevent the app from loading cached images/data and always load only the supplied data.
 @app.context_processor
@@ -21,81 +23,90 @@ def dated_url_for(endpoint, **values):
             values['q'] = int(os.stat(file_path).st_mtime)
     return url_for(endpoint, **values)
 
-# # Login page
-# @app.route('/login', methods= ['GET','POST'])
-# def login():
-#     if request.method == 'GET':
-#         return render_template('login.html', fail=False)
-#     if request.method == 'POST':
-#         email = request.form.get('name')
-#         password = request.form.get('pass')
-#         user_entry = User.query.filter(User.UserName == UserName).first()
-#         if not user_entry:
-#             return render_template('login.html',user_not_found = True, fail=False)
-#         else:
-#             if(user_entry.Password == password):
-#                 return redirect('/'+UserName+'/lists')
-#             else:
-#                 return render_template('login.html', user_not_found=False, fail=True)
-
-# # Signup page
-# @app.route('/signup', methods=['GET','POST'])
-# def signup():  
-#     if request.method == 'GET':
-#         return render_template('signup.html')
-#     if request.method == 'POST':
-#         fs_uniquifier = ''.join(random.choice(string.ascii_letters) for i in range(8))
-#         new_entry = User(UserName =  request.form.get('cname'), Password = request.form.get('cpass'),fs_uniquifier=fs_uniquifier)
-#         db.session.add(new_entry)
-#         db.session.commit()
-#         return redirect('/'+request.form.get('cname') + '/lists')
-
-@app.route('/lists', methods = ['GET'])
+@app.route('/', methods = ['GET'])
+@login_required
 def userpage():
     if request.method == 'GET' :
         curr_user = flask_login.current_user
-        curr_lists = curr_user.lists
-        print(curr_lists)
-        list_dic={}
-        for card in all_cards:
-            if card.List_name not in list_dic.keys():
-                list_dic[card.List_name] = []
-            list_dic[card.List_name].append(card)
+        UserName = curr_user.username
+        curr_lists = curr_user.lists.all()
+        list_tup={}
+        for l in curr_lists:
+            cards = {"card-"+str(card.CardID):card.as_dict() for card in l.cards.all()}
+            list_tup["list-"+str(l.ListID)]= {'listinfo':l.as_dict(),'cards':cards}
 
-        return render_template('userpage.html',name= UserName, lists = list_dic.items())
+        return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup))
 
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/addlist', methods=['POST'])
+@login_required
 def list_add():
-    if request.method == 'GET':
-        return render_template('list_add.html', name = Username)
     if request.method == 'POST':
-        tracker_name = request.form.get('tracker_name')
-        tracker_desc = request.form.get('tracker_desc')
-        new_tracker = Lists(UserName = Username, Tracker_name = tracker_name,\
-                                Description = tracker_desc, Active = 0)
-        db.session.add(new_tracker)
+        userid = flask_login.current_user.id
+        list_name = request.form.get('list_name')
+        list_desc = request.form.get('list_desc')
+        new_list = Lists(List_name = list_name,\
+                                Description = list_desc)
+        db.session.add(new_list)
         db.session.commit()
-        return redirect('/'+ Username +'/'+tracker_name+'/logs')
+        new_assn = Listusers(ListID = new_list.ListID,id = userid)
+        db.session.add(new_assn)
+        db.session.commit()
+        return redirect('/')
 
-# @app.route('/<string:UserName>/<string:Tracker_name>/edit', methods=['GET', 'POST'])
-# def tracker_edit(UserName, Tracker_name):
-#     if request.method == 'GET':
-#         tracker_info = Lists.query.filter(Lists.Tracker_name == Tracker_name).filter(Lists.UserName == UserName).first()
-#         return render_template('tracker_edit.html', name = UserName, tracker_name = Tracker_name, desc = tracker_info.Description)
+@app.route('/<int:listid>/edit', methods=['GET', 'POST'])
+def list_edit(listid):
     
-#     if request.method == 'POST':
+    if request.method == 'POST':
+        curr_user = flask_login.current_user
+        list_info = curr_user.lists.filter(Lists.ListID == listid).first()
+        new_tname = request.form.get('list_name')
+        new_desc = request.form.get('list_desc')
+        list_info.List_name = new_tname
+        list_info.Description = new_desc
+        db.session.commit()
 
-#         tracker_info = Lists.query.filter(Lists.Tracker_name == Tracker_name).filter(Lists.UserName == UserName).first()
-#         new_tname = request.form.get('tracker_name')
-#         new_desc = request.form.get('tracker_desc')
-#         tracker_info.Tracker_name = new_tname
-#         tracker_info.Description = new_desc
-#         db.session.commit()
+        return redirect('/')
 
-#         logs_info = Logs.query.filter(Logs.Tracker_name == Tracker_name).filter(Logs.UserName == UserName).update({"Tracker_name":new_tname})
-#         db.session.commit()
+@app.route('/<int:listid>/addcard', methods=['POST'])
+def add_card(listid):
+    if request.method == 'POST':
+        
+        new_time = request.form.get('date_created').replace('T',' ')
+        new_datetime = datetime.datetime.strptime(new_time, "%Y-%m-%d %H:%M")
+        deadline = request.form.get('deadline').replace('T',' ')
+        deadline = datetime.datetime.strptime(deadline, "%Y-%m-%d %H:%M")
 
-#         return redirect('/'+ UserName+ '/trackers')
+        new_card = Cards( ListID = listid, \
+                        Date_created = deadline.replace(second=0), \
+                        Last_modified = datetime.datetime.now().replace(second = 0), \
+                        Deadline = new_datetime.replace(second = 0),\
+                        Date_completed = None,\
+                        Value = request.form.get('value'),\
+                        Description =request.form.get('desc'))
+        
+        db.session.add(new_card)
+        db.session.commit()
+        card_assn = Cardlists( CardID = new_card.CardID,ListID=listid)
+        db.session.add(card_assn)
+        db.session.commit()
+
+        return redirect('/')
+
+@app.route('/<int:cardid>/edit', methods=['POST'])
+def edit_card(cardid):
+    if request.method == 'POST':
+        
+        log_entry = Cards.query.filter(Cards.CardID == cardid).first()
+        new_date = request.form.get('date_created').replace('T',' ')
+        
+        log_entry.Date_created = datetime.datetime.strptime(new_date, "%Y-%m-%d %H:%M")
+        log_entry.Value = request.form.get('value')
+        log_entry.Description  = request.form.get('desc')
+        log_entry.Last_modified = datetime.datetime.now().replace(second = 0)
+
+        db.session.commit()
+
+        return redirect('/')
 
 # @app.route('/<string:UserName>/<string:Tracker_name>/delete', methods = ['GET'])
 # def tracker_delete(UserName, Tracker_name):
@@ -199,36 +210,7 @@ def list_add():
         
 #         return render_template('logs.html', logs_list=logs_list, name = UserName, tracker_name = Tracker_name)
 
-# @app.route('/<string:UserName>/<string:Tracker_name>/logs/add', methods=['GET', 'POST'])
-# def add_log(UserName, Tracker_name):
 
-#     if request.method == 'GET':
-        
-#         present_time = datetime.datetime.now()
-#         present_datetime = present_time.strftime ("%Y-%m-%dT%H:%M")
-#         return render_template('log_add.html', name = UserName, present_datetime = present_datetime, tracker_name = Tracker_name)
-
-#     if request.method == 'POST':
-        
-#         new_time = request.form.get('date_created').replace('T',' ')
-#         new_datetime = datetime.datetime.strptime(new_time, "%Y-%m-%d %H:%M")
-
-#         new_log = Logs( UserName = UserName, \
-#                         Tracker_name = Tracker_name, \
-#                         Date_created = new_datetime.replace(second = 0),\
-#                         Last_modified = datetime.datetime.now().replace(second = 0), \
-#                       Value = request.form.get('value'),\
-#                       Description =request.form.get('desc'))
-        
-#         db.session.add(new_log)
-#         db.session.commit()
-        
-#         tracker_info = Lists.query.filter(Lists.UserName == UserName).filter(Lists.Tracker_name == Tracker_name).first()
-#         tracker_info.Active += 1
-#         db.session.add(tracker_info)
-#         db.session.commit()
-
-#         return redirect('/'+ UserName+ '/' + Tracker_name + '/logs')
 
 # @app.route('/<string:UserName>/<string:Tracker_name>/logs/<int:LogID>/delete', methods=['GET'])
 # def log_delete(UserName,Tracker_name, LogID):
@@ -243,26 +225,3 @@ def list_add():
 #             db.session.commit()
 #         return redirect('/'+ UserName+'/'+ Tracker_name+'/logs')
 
-# @app.route('/<string:UserName>/<string:Tracker_name>/logs/<int:LogID>/edit', methods=['GET', 'POST'])
-# def log_edit(UserName,Tracker_name, LogID):
-#     if request.method == 'GET':
-        
-#         log_entry = Logs.query.filter(Logs.LogID == LogID).first()
-#         date_created = log_entry.Date_created.replace(' ', 'T')[:-3]
-        
-#         return render_template('log_edit.html',log = log_entry, name = UserName,\
-#              lid = LogID, date_created = date_created, tracker_name = Tracker_name)
-    
-#     if request.method == 'POST':
-        
-#         log_entry = Logs.query.filter(Logs.LogID == LogID).first()
-#         new_date = request.form.get('date_created').replace('T',' ')
-        
-#         log_entry.Date_created = datetime.datetime.strptime(new_date, "%Y-%m-%d %H:%M")
-#         log_entry.Value = request.form.get('value')
-#         log_entry.Description  = request.form.get('desc')
-#         log_entry.Last_modified = datetime.datetime.now().replace(second = 0)
-
-#         db.session.commit()
-
-#         return redirect('/'+ UserName+'/'+Tracker_name+'/logs')

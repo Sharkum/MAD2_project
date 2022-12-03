@@ -1,0 +1,56 @@
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editcard-{{card.CardID}}">
+    Edit
+</button>
+<!-- 
+<div class="modal fade" id="editcard-{{card.CardID}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit {{card.CardID}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="/{{card.CardID}}/editcard" method="POST" id="card_id" class="container px-5 text-center">
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Time of Creation</label>
+                    <div class="col-5">
+                        <input type='datetime-local' name='date_created' value={{card.Date_created}} class="form-control" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Value</label>
+                    <div class="col-5">
+                        <input type="number" step="any" name="value" class="form-control" value="{{card.Value}}" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Deadline</label>
+                    <div class="col-5">
+                        <input type='datetime-local' name='deadline' class="form-control" value="{{card.Deadline}}" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Description</label>
+                    <div class="col-5">
+                        <input type="text" name="desc" class="form-control" value="{{card.Description}}"/>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Date Completed</label>
+                    <div class="col-5">
+                        <input type='datetime-local' name='deadline' class="form-control" value="{{card.Date_completed}}" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="py-3 text-center">
+                    <input type="submit" value = "Submit" class="btn btn-primary mb-3">
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div> -->

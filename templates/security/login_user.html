@@ -4,7 +4,7 @@
 {% block content %}
 {% include "security/_messages.html" %}
 <h1 class="text-center fw-bold display-1">Kanban v2</h1>
-  <form action="/login" method="POST" name="login_user_form">
+  <form action="/login?next=/" method="POST" name="login_user_form">
     <div class="container mb-3 col-6 text-center display-6">
     {{ login_user_form.hidden_tag() }}
     {{ render_form_errors(login_user_form) }}

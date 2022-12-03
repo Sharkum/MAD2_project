@@ -6,22 +6,23 @@
     <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add list</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <form action="/{{name}}/add" method="POST" id="list_add" class="container px-5 text-center">
-                <div class="mb-3 row justify-content-center">
-                    <label class="display-4 col col-form-label text-lg-end">Value</label>
+            <form action="/addlist" method="POST" id="list_add" class="container px-5 text-center">
+                <div class="row justify-content-center">
+                    <label class="col col-form-label text-lg-end">Name of list</label>
                     <div class="col-5">
-                        <input type="number" step="any" name="value" class="form-control" required />
+                        <input type='text' name='list_name' class="form-control" required />
                     </div>
                     <div class="col-2"></div>
                 </div>
+                <br>
                 <div class="mb-3 row justify-content-center">
-                    <label class="display-4 col col-form-label text-lg-end">Description</label>
+                    <label class="col col-form-label text-lg-end">Description</label>
                     <div class="col-5">
-                        <input type="text" name="desc" class="form-control"/>
+                        <input type="text" name="list_desc" class="form-control"/>
                     </div>
                     <div class="col-2"></div>
                 </div>
@@ -29,10 +30,6 @@
                     <input type="submit" value = "Submit" class="btn btn-primary mb-3">
                 </div>
             </form>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
         </div>
     </div>
     </div>
