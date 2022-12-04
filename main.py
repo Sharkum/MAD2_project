@@ -20,8 +20,10 @@ security = Security(app,user_datastore)
 
 from application.controllers import *
 
-from application.api import UsersAPI
-api.add_resource(UsersAPI,'/api/user')
+from application.api import UsersAPI,CardsAPI
+
+api.add_resource(UsersAPI,'/api/getlists')
+api.add_resource(CardsAPI,'/api/updatecards')
 
 if __name__ == "__main__":
     app.run(debug = True)

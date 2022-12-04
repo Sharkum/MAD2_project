@@ -11,8 +11,10 @@ class Cards(db.Model):
     Last_modified = db.Column(db.TIMESTAMP, nullable=False)
     Deadline = db.Column(db.TIMESTAMP,  nullable=False)
     Date_completed = db.Column(db.TIMESTAMP)
+    Title = db.Column(db.String,nullable=False)
     Value = db.Column(db.Integer, nullable = False)
     Description = db.Column(db.String, nullable = True)
+    
     lists = db.relationship('Lists',secondary='Cardlists', backref=db.backref('cards',lazy='dynamic'))
     
     def as_dict(self):

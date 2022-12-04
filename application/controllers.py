@@ -34,7 +34,7 @@ def userpage():
         for l in curr_lists:
             cards = {"card-"+str(card.CardID):card.as_dict() for card in l.cards.all()}
             list_tup["list-"+str(l.ListID)]= {'listinfo':l.as_dict(),'cards':cards}
-
+        print(list_tup)
         return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup))
 
 @app.route('/addlist', methods=['POST'])
@@ -81,6 +81,7 @@ def add_card(listid):
                         Last_modified = datetime.datetime.now().replace(second = 0), \
                         Deadline = new_datetime.replace(second = 0),\
                         Date_completed = None,\
+                        Title = request.form.get('Title'),\
                         Value = request.form.get('value'),\
                         Description =request.form.get('desc'))
         
@@ -92,21 +93,6 @@ def add_card(listid):
 
         return redirect('/')
 
-@app.route('/<int:cardid>/edit', methods=['POST'])
-def edit_card(cardid):
-    if request.method == 'POST':
-        
-        log_entry = Cards.query.filter(Cards.CardID == cardid).first()
-        new_date = request.form.get('date_created').replace('T',' ')
-        
-        log_entry.Date_created = datetime.datetime.strptime(new_date, "%Y-%m-%d %H:%M")
-        log_entry.Value = request.form.get('value')
-        log_entry.Description  = request.form.get('desc')
-        log_entry.Last_modified = datetime.datetime.now().replace(second = 0)
-
-        db.session.commit()
-
-        return redirect('/')
 
 # @app.route('/<string:UserName>/<string:Tracker_name>/delete', methods = ['GET'])
 # def tracker_delete(UserName, Tracker_name):

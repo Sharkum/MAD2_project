@@ -1,20 +1,27 @@
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createcard-{{list[0].ListID}}">
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" :data-bs-target="'#createcard-'+list['listinfo'].ListID">
     Add card
 </button>
 
-<div class="modal fade" id="createcard-{{list[0].ListID}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" :id="'createcard-'+list['listinfo'].ListID" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Card to {{list[0].ListID}}</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Card to ${list['listinfo'].ListID}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <form action="/{{list[0].ListID}}/addcard" method="POST" id="log_add" class="container px-5 text-center">
+            <form :action="'/'+list['listinfo'].ListID+'/addcard'" method="POST" id="card_add" class="container px-5 text-center">
                 <div class="mb-3 row justify-content-center">
                     <label class="col-5 form-label text-lg-end">Time of Creation</label>
                     <div class="col-5">
                         <input type='datetime-local' name='date_created' :value=present_datetime class="form-control" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col-5 form-label text-lg-end">Title</label>
+                    <div class="col-5">
+                        <input type="text" name="Title" class="form-control" required/>
                     </div>
                     <div class="col-2"></div>
                 </div>
@@ -26,16 +33,16 @@
                     <div class="col-2"></div>
                 </div>
                 <div class="mb-3 row justify-content-center">
-                    <label class="col-5 form-label text-lg-end">Deadline</label>
+                    <label class="col-5 form-label text-lg-end">Description</label>
                     <div class="col-5">
-                        <input type='datetime-local' name='deadline' class="form-control" required />
+                        <input type="text" name="desc" class="form-control"/>
                     </div>
                     <div class="col-2"></div>
                 </div>
                 <div class="mb-3 row justify-content-center">
-                    <label class="col-5 form-label text-lg-end">Description</label>
+                    <label class="col-5 form-label text-lg-end">Deadline</label>
                     <div class="col-5">
-                        <input type="text" name="desc" class="form-control"/>
+                        <input type='datetime-local' name='deadline' class="form-control" required />
                     </div>
                     <div class="col-2"></div>
                 </div>
