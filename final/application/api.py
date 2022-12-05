@@ -70,7 +70,7 @@ class CardsAPI(Resource):
                 cardid = card['CardID']
                 datecomp=None
                 if card['Date_completed'] != None:
-                    datecomp = datetime.datetime.strptime(card['Date_completed'].split('.')[0][:-3], "%Y-%m-%dT%H:%M")
+                    datecomp = datetime.datetime.strptime(card['Date_completed'], "%Y-%m-%dT%H:%M")
                     
                 updatedcard = {
                     "ListID": card['ListID'],

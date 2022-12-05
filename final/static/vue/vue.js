@@ -251,9 +251,7 @@ var app = new Vue({
         },
         finish_task(cardid){
             listid = document.getElementById('card-'+cardid).parentElement.id;
-            this.lists[listid].cards['card-'+cardid].Date_completed = (new Date()).toISOString()
-
-            console.log((new Date()).toISOString())
+            this.lists[listid].cards['card-'+cardid].Date_completed = (new Date()).toISOString().split('.')[0].slice(0,-3)
             
             if(!(listid in this.edited)){
                 this.edited[listid] = new Set()
