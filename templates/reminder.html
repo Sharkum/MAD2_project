@@ -1,0 +1,45 @@
+<button @click="unset_remind()" type="button" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#reminder">
+    Add reminder
+</button>
+
+<div class="modal fade" id="reminder" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Set reminder settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="row justify-content-center">
+                    <label class="col col-form-label text-lg-end">Daily time to remind</label>
+                    <div class="col-5">
+                        <input v-model="reminder_time" type='datetime-local' class="form-control" required />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <br>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col col-form-label text-lg-end">Message</label>
+                    <div class="col-5">
+                        <input v-model="reminder_message" type="text" class="form-control" required/>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="mb-3 row justify-content-center">
+                    <label class="col col-form-label text-lg-end">API url</label>
+                    <div class="col-5">
+                        <input v-model="reminder_url" type="text" class="form-control" required/>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="py-3 text-center">
+                    <button @click="set_remind()" class="btn btn-outline-dark" data-bs-dismiss="modal">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>

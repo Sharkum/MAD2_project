@@ -3,67 +3,47 @@
 <head>
     <title> Lists of {{name}}</title>
     <link href="/static/css/main.css" rel="stylesheet" >
+    <script src="https://kit.fontawesome.com/e0e3bca50e.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
     <script type="text/JavaScript"> 
          var temp = {{lists|tojson}}
     </script>
 </head>
 <body>
-    <i class="fa-light fa-pen-to-square"></i>
-    <div class="container" id="app">
-        <div class="row p-3">
-            <div class="col text-start">
-                {% include 'sidebar.html' %}
-            </div>
-            <div class="col text-end">
-                {% include 'list_add.html' %}
-            </div>
-            <p hidden>${lists}</p>
+    <div class="w-100" id="app">
+    <div class="row p-3 w-125">
+        <div class="col text-start">
+            {% include 'sidebar.html' %}
         </div>
-        <main class="row p-3">
-            <list class="col p-3 border bg-light" v-for="list in lists" :id="'list-'+list['listinfo'].ListID">
-                <div class="row text-end">{% include 'card_add.html' %}</div>
-                <card class="row w-75 mx-auto text-center" v-for="card in list['cards']" :id="'card-'+card.CardID" draggable="true">
-                    <div v-if="editing.includes(card.CardID)">
-                        <div class="row">
-                            <input v-model="card.CardID" class="col px-5 py-3 text-start form-control">
-                            <p class="col text-start">${card.Date_created}</p>
-                            <input v-model="card.Value" class="col px-5 py-3 text-end form-control">
-                        </div>
-                        <div class="row">
-                            <p>${card.Description}</p>
-                        </div>
-                        <div class="row">
-                            <p class="col text-start">${last_modified(card.Last_modified)}</p>
-                            <p class="col text-start">${card.Deadline}</p>
-                            <button @click="card_edited(card.CardID)" type="button" class="col-2 text-end btn btn-primary">
-                                save
-                            </button>
-                        </div>
-                    </div>
-                    <div v-else>
-                        <div class="row">
-                            <p class="col px-5 py-3 text-start">${card.CardID}</p>
-                            <p class="col">${card.Date_created}</p>
-                            <p class="col px-5 py-3 text-end">${card.Value}</p>
-                        </div>
-                        <div class="row">
-                            <p>${card.Description}</p>
-                        </div>
-                        <div class="row">
-                            <p class="col text-start">${last_modified(card.Last_modified)}</p>
-                            <p class="col text-start">${card.Deadline}</p>
-                            <button @click="card_edit(card.CardID)" type="button" class="col-2 text-end btn btn-primary">
-                                Edit
-                            </button>
-                        </div>
-                    </div>
-                </card>
-            </list>
-        </main>
-        <button @click="update_cards()" type="button" class="col-2 text-end btn btn-primary">
-            Save changes
-        </button>
+        
+        <h3 class="col text-center">Lists of {{name}}</h3>
+        <div class="col text-end">
+            {% include 'list_add.html' %}
+            {% include 'reminder.html' %}
+            <button @click="update_all()" type="button" class="btn btn-outline-success">
+                Save changes
+            </button>
+        </div>
+        <p hidden>${lists}</p>
+    </div>
+    <main class="row p-3 w-100 text-center">
+        <list class="col p-3 border bg-light" v-if="lists_shown.includes(list['listinfo'].ListID)" v-for="list in lists" :id="'list-'+list['listinfo'].ListID">
+                {% include 'list_edit.html' %}
+            <card class="row w-75 mx-auto text-center" v-for="card in list['cards']" :id="'card-'+card.CardID" draggable="true">
+                <div v-if="editing.includes(card.CardID)">
+                    {% include 'card_edit.html' %}
+                </div>
+                <div v-else>
+                    {% include 'card.html' %}
+                </div>
+            </card>
+        </list>
+    </main>
+    <div class="row p-3 text-center">
+        <form action="/summary" method="POST" id="summary">
+            <input type="submit" value = "Summary" class="btn btn-outline-dark">
+        </form>
+    </div>
     </div>
 </body>
 <script type="text/javascript" src = "{{ url_for('static',filename='vue/vue.js')}}"></script>

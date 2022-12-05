@@ -1,0 +1,18 @@
+<button class="row btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+  <i class="fa-solid fa-bars fa-2x"></i>
+</button>
+
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Kanban V2</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="row">
+      <div v-for="list in lists">
+        <input type="checkbox" :id="'check-'+list['listinfo'].ListID" :value="list['listinfo'].ListID" v-model="lists_shown">
+        <label :for="'check-'+list['listinfo'].ListID">${list['listinfo'].List_name}</label>
+      </div>
+    </div>
+  </div>
+</div>

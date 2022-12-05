@@ -7,6 +7,7 @@ import json
 from flask_login import current_user
 from flask_security import auth_token_required
 
+
 class DefaultError(HTTPException):
     def __init__(self, status_code, desc):
         self.response = make_response('', status_code)
@@ -58,19 +59,17 @@ class UsersAPI(Resource):
 class CardsAPI(Resource):
     @auth_token_required
     def post(self):
-        # try:
-        curr_user = current_user
-        details = json.loads(request.get_data())
-        # except:
-        #     raise DefaultError(status_code=400, desc='Bad Request')
+        try:
+            curr_user = current_user
+            details = json.loads(request.get_data())
+        except:
+            raise DefaultError(status_code=400, desc='Bad Request')
         result = []
         for card in details.values():
-            # try:
+            try:
                 cardid = card['CardID']
-                
-                if not card['Date_completed']:
-                    datecomp = None
-                else:
+                datecomp=None
+                if card['Date_completed'] != None:
                     datecomp = datetime.datetime.strptime(card['Date_completed'], "%Y-%m-%dT%H:%M")
                     
                 updatedcard = {
@@ -87,7 +86,40 @@ class CardsAPI(Resource):
                 assn = Cardlists.query.filter(Cardlists.CardID == cardid).update({'ListID':card['ListID']})
                 db.session.commit()
                 result.append(cardid)
-            # except:
-            #     raise DefaultError(status_code=500, desc="Internal Server Error")
+            except:
+                raise DefaultError(status_code=500, desc="Internal Server Error")
         return json.dumps(result)
+    
+    @auth_token_required
+    def delete(self,cardid):
+        try:
+            Cards.query.filter(Cards.CardID == cardid).delete()
+            Cardlists.query.filter(Cardlists.CardID == cardid).delete()
+            db.session.commit()
+        except:
+            raise DefaultError(status_code=500, desc="Internal Server Error")
         
+        return json.dumps(str(cardid)+" deleted successfuly")
+    
+class ListsAPI(Resource):
+    @auth_token_required
+    def post(self):
+        try:
+            curr_user = current_user
+            details = json.loads(request.get_data())
+        except:
+            raise DefaultError(status_code=400, desc='Bad Request')
+        result = []
+        for list in details.values():
+            try:
+                listid = list['ListID']
+                    
+                updatedlist = {
+                    "List_name": list['List_name']
+                }
+                dbcard = Lists.query.filter(Lists.ListID == listid).update(updatedlist)
+                db.session.commit()
+                result.append(listid)
+            except:
+                raise DefaultError(status_code=500, desc="Internal Server Error")
+        return json.dumps(result)

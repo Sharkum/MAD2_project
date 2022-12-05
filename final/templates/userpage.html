@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Lists of {{name}}</title>
+    <link href="/static/css/main.css" rel="stylesheet" >
+    <script src="https://kit.fontawesome.com/e0e3bca50e.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
+    <script type="text/JavaScript"> 
+         var temp = {{lists|tojson}}
+    </script>
+</head>
+<body>
+    <div class="w-100" id="app">
+    <div class="row p-3 w-125">
+        <div class="col text-start">
+            {% include 'sidebar.html' %}
+        </div>
+        
+        <h3 class="col text-center">Lists of {{name}}</h3>
+        <div class="col text-end">
+            {% include 'list_add.html' %}
+            {% include 'reminder.html' %}
+            <button @click="update_all()" type="button" class="btn btn-outline-success">
+                Save changes
+            </button>
+        </div>
+        <p hidden>${lists}</p>
+    </div>
+    <main class="row p-3 w-100 text-center">
+        <list class="col p-3 border bg-light" v-if="lists_shown.includes(list['listinfo'].ListID)" v-for="list in lists" :id="'list-'+list['listinfo'].ListID">
+                {% include 'list_edit.html' %}
+            <card class="row w-75 mx-auto text-center" v-for="card in list['cards']" :id="'card-'+card.CardID" draggable="true">
+                <div v-if="editing.includes(card.CardID)">
+                    {% include 'card_edit.html' %}
+                </div>
+                <div v-else>
+                    {% include 'card.html' %}
+                </div>
+            </card>
+            <div class="row p-3">
+                <div class="col text-center">{% include 'card_add.html' %}</div>
+            </div>
+        </list>
+    </main>
+    <div class="row p-3 text-center">
+        <form action="/summary" method="POST" id="summary">
+            <input type="submit" value = "Summary" class="btn btn-outline-dark">
+        </form>
+    </div>
+    </div>
+</body>
+<script type="text/javascript" src = "{{ url_for('static',filename='vue/vue.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"></script>
+</html>

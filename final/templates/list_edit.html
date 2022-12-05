@@ -1,0 +1,25 @@
+<div v-if="list_editing.includes('list-'+list['listinfo'].ListID)" class="row p-3">
+    <div class="col"></div>
+    <div class="col text-end">
+        <div class="row">
+            <input v-model="list['listinfo'].List_name" class="col form-control">
+            <button @click="lists_edited('list-'+list['listinfo'].ListID)" type="button" class="col btn btn-outline-success">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col text-end">
+        {% include 'list_delete.html' %}
+    </div>
+</div>
+<div v-else class="row p-3">
+    <div class="col"></div>
+    <h3 class="col text-center">${list['listinfo'].List_name}
+        <button @click="list_edit('list-'+list['listinfo'].ListID)" type="button" class="btn">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+    </h3>
+    <div class="col text-end">
+        {% include 'list_delete.html' %}
+    </div>
+</div>

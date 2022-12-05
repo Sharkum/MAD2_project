@@ -1,0 +1,6 @@
+Flask
+Flask-SQLAlchemy
+flask-restful
+flask-security-too
+numpy
+matplotlib

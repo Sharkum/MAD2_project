@@ -1,11 +1,18 @@
-<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button>
+<button class="row btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+  <i class="fa-solid fa-bars fa-2x"></i>
+</button>
 
 <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
   <div class="offcanvas-header">
-    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Offcanvas with body scrolling</h5>
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Select Lists to be Shown</h5>
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
-    <p>Try scrolling the rest of the page to see this option in action.</p>
+    <div class="row">
+      <div v-for="list in lists">
+        <input class="form-check-input fs-4" type="checkbox" :id="'check-'+list['listinfo'].ListID" :value="list['listinfo'].ListID" v-model="lists_shown">
+        <label class="form-check-label fs-4" :for="'check-'+list['listinfo'].ListID">${list['listinfo'].List_name}</label>
+      </div>
+    </div>
   </div>
 </div>

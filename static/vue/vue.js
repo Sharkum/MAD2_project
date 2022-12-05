@@ -51,10 +51,18 @@ var app = new Vue({
     delimiters:['${', '}'],
     data: {
         lists: JSON.parse(temp),
+        lists_shown: [],
         editing: [],
         edited:{},
+        list_editing:[],
+        list_edited:new Set(),
         auth_token : null,
-        interval:null
+        interval:null,
+        metrics: JSON.parse(temp),
+        reminder_time:new Date(Date.parse(new Date())+1000*60*60*24),
+        reminder_message:null,
+        reminder_url:null,
+        remind_set:false
     },
     methods:{
         card_transfer(card_id,listold,listnew){
@@ -89,9 +97,18 @@ var app = new Vue({
 
             return
         },
+        list_edit(listid){
+            this.list_editing.push(listid)
+            return
+        },
+        lists_edited(listid){
+            this.list_edited.add(listid)
+            this.list_editing = this.list_editing.filter(a => a != listid)
+            return
+        },
         last_modified(time){
             var last_modified = new Date(time);
-            diff = new Date(this.present_datetime) - last_modified
+            var diff = new Date(this.present_datetime) - last_modified
             var seconds = diff/1000
             var minutes = seconds/60
             var hours = minutes/60
@@ -132,19 +149,140 @@ var app = new Vue({
                 method:"POST",
                 body: JSON.stringify(body_list)
                 
-            }).then(response => console.log(response))
+            }).then(response => response)
             this.edited = {}
+            this.editing = []
+            return
+        },
+        async update_lists(){
+            let body_list = {}
+            var changes = 0
+            var temp = Array.from(this.list_edited)
+            for( const listid in temp){
+                body_list[temp[listid]] = this.lists[temp[listid]].listinfo
+                changes = changes + 1
+            }
+            if(changes == 0){
+                return
+            }
+            const response = fetch('http://127.0.0.1:5000/api/updatelists',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"POST",
+                body: JSON.stringify(body_list)
+                
+            }).then(response => response)
+            this.list_edited = {}
+            this.list_editing = []
+            return
+        },
+        update_all(){
+            this.update_cards();
+            this.update_lists()
+            return
+        },
+        async card_del(cardid){
+            listid = document.getElementById('card-'+cardid).parentElement.id;
+
+            document.getElementById('card-'+cardid).style.display="none";
+
+            delete this.lists[listid].cards['card-'+cardid]
+            
+            const response = fetch('http://127.0.0.1:5000/api/'+cardid+'/delete',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"DELETE",
+                body: {}})
+            return
+        },
+        unset_remind(){
+            this.remind_set=false;
+            return
+        },
+        set_remind(){
+            this.remind_set=true;
+            localStorage.setItem('remind_time',this.reminder_time)
+            localStorage.setItem('message',this.reminder_message)
+            localStorage.setItem('url',this.reminder_url)
+            return
+        },
+        send_reminder(){
+            if(!this.reminder_url | !this.reminder_message){
+                return
+            }
+            let tasks_left=0
+            for(l in this.lists){
+                let list = this.lists[l]
+                for(c in list.cards){
+                    if(!list.cards[c].Deadline){
+                        tasks_left=task_left+1
+                        break
+                    }
+                }
+                if(tasks_left) break
+            }
+            if(tasks_left){
+                var response = fetch(this.reminder_url,{method:"POST",body:JSON.stringify({'text':this.reminder_message})})
+            }
+            return
+        },
+        get_deadline(time){
+            let deadline = new Date(time)
+            let diff = deadline - new Date()
+
+            var seconds = diff/1000
+            var minutes = seconds/60
+            var hours = minutes/60
+            var days = hours/24
+            var weeks = days/7
+            if(weeks > 1){
+                return "Due in "+Math.floor(weeks) + " weeks"
+            }
+            if(days > 1){
+                return "Due in " + Math.floor(days) + " days"
+            }
+            if(hours > 1){
+                return "Due in " + Math.floor(hours) + " hours"
+            }
+            if(minutes > 1){
+                return "Due in " + Math.floor(minutes) + " minutes"
+            }
+            return "Deadline missed"
+        },
+        finish_task(cardid){
+            listid = document.getElementById('card-'+cardid).parentElement.id;
+            this.lists[listid].cards['card-'+cardid].Date_completed = (new Date()).toISOString().split('.')[0].slice(0,-3)
+            
+            if(!(listid in this.edited)){
+                this.edited[listid] = new Set()
+            }
+
+            this.edited[listid].add('card-'+cardid)
             return
         }
-        
     },
     computed:{
         present_datetime(){
             var curr = new Date()
             return curr.getFullYear()+'-'+(curr.getMonth()<9?'0':'')+(curr.getMonth()+1)+'-'+(curr.getDate()<10?'0':'')+curr.getDate()+'T'+(curr.getHours()<10?'0':'')+curr.getHours()+':'+(curr.getMinutes()<10?'0':'')+curr.getMinutes()
+        },
+        remind_delay(){
+            if(this.remind_set){
+            var curr = new Date()
+            var target = curr
+            var remind_time = new Date(this.reminder_time)
+            if(curr.getTime() > remind_time.getTime()){
+                target = new Date(Date.parse(curr)+1000*60*60*24)
+            }
+            var reminding_date = new Date(target.getFullYear(),target.getMonth(),target.getDate(),
+                                            remind_time.getHours(),remind_time.getMinutes(),remind_time.getSeconds())
+            
+            return reminding_date - curr
+        }
         }
     },
     async created(){
+
         const loggedout = await fetch('http://127.0.0.1:5000/logout')
         let data = {
             "email":"sharan342.kumar@gmail.com",
@@ -156,7 +294,25 @@ var app = new Vue({
                             body: JSON.stringify(data)
                             }).then(response => response.json())
         this.auth_token = response.response.user.authentication_token;
+
+
         this.interval = setInterval(()=>{
-            this.update_cards()}, 180000)
+            this.update_all()}, 180000)
+
+
+        this.reminder_time=localStorage.getItem('remind_time')
+        this.reminder_message=localStorage.getItem('message')
+        this.reminder_url=localStorage.getItem('url')
+
+
+        if(this.reminder_time){
+            var timeout = setTimeout(()=>{
+                this.send_reminder();
+            },this.remind_delay)
+        }
+
+        for(l in this.lists){
+            this.lists_shown.push(this.lists[l]['listinfo']['ListID']);
+        }
     }
 });

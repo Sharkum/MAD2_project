@@ -1,0 +1,37 @@
+<div class="row border">
+    <h5 class="col text-start">${card.Title}</h5>
+    <p class="col-3 text-end">${card.Value}</p>
+</div>
+<div class="row border">
+    <p class="col w-75 text-start">${card.Description}</p>
+    <div class="col w-25 text-end">
+        <button @click="card_edit(card.CardID)" type="button" class="btn">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+        <button @click="card_del(card.CardID)" type="button" class="col btn btn-outline-danger">
+            <i class="fa-regular fa-trash-can"></i>
+        </button>
+    </div>
+</div>
+<div class="row text-center border">
+    <p class="col-5 text-start">${last_modified(card.Last_modified)}</p>
+    <div v-if="card.Date_completed == null" class="col">
+        <div class="row">
+            <p class="col text-start">${get_deadline(card.Deadline)}</p>
+            <div class="col text-end">
+                <button @click="finish_task(card.CardID)" type="button" class="btn btn-outline-success">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div v-else class="col text-end">
+        <div class="row">
+            <p class="col text-start">Task completed</p>
+            <div class="col text-end">
+                <i class="text-success fa-solid fa-check fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    
+</div>

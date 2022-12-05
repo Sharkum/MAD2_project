@@ -1,36 +1,25 @@
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editlist-{{list[0].ListID}}">
-    Edit
-</button>
-
-<div class="modal fade" id="editlist-{{list[0].ListID}}" tabindex="-1" aria-labelledby="listedit" aria-hidden="true">
-    <div class="modal-dialog">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit {{list[0].List_name}}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form action="/{{list[0].ListID}}/edit" method="POST" id="list_edit" class="container px-5 text-center">
-                <div class="row justify-content-center">
-                    <label class="col col-form-label text-lg-end">Name of list</label>
-                    <div class="col-5">
-                        <input type='text' name='list_name' class="form-control" value="{{list[0].List_name}}" required />
-                    </div>
-                    <div class="col-2"></div>
-                </div>
-                <br>
-                <div class="mb-3 row justify-content-center">
-                    <label class="col col-form-label text-lg-end">Description</label>
-                    <div class="col-5">
-                        <input type="text" name="list_desc" class="form-control" value="{{list[0].Description}}"/>
-                    </div>
-                    <div class="col-2"></div>
-                </div>
-                <div class="py-3 text-center">
-                    <input type="submit" value = "Submit" class="btn btn-primary mb-3">
-                </div>
-            </form>
+<div v-if="list_editing.includes('list-'+list['listinfo'].ListID)" class="row p-3">
+    <div class="col text-end">
+        <div class="row">
+            <input v-model="list['listinfo'].List_name" class="col form-control">
+            <button @click="lists_edited('list-'+list['listinfo'].ListID)" type="button" class="col btn btn-outline-success">
+                <i class="fa-solid fa-check"></i>
+            </button>
         </div>
     </div>
+    <div class="col text-end">
+        {% include 'card_add.html' %}
+        {% include 'list_delete.html' %}
+    </div>
+</div>
+<div v-else class="row p-3">
+    <h3 class="col text-center">${list['listinfo'].List_name}
+        <button @click="list_edit('list-'+list['listinfo'].ListID)" type="button" class="btn">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+    </h3>
+    <div class="col text-end">
+        {% include 'card_add.html' %}
+        {% include 'list_delete.html' %}
     </div>
 </div>
