@@ -38,7 +38,7 @@ class Cardlists(db.Model):
 class Lists(db.Model):
     __tablename__ = 'Lists'
     ListID = db.Column(db.Integer,primary_key=True, nullable=False,autoincrement= True)
-    List_name = db.Column(db.String, nullable=False, primary_key=True)
+    List_name = db.Column(db.String, nullable=False)
     Description = db.Column(db.String)
     users = db.relationship('User',secondary='Listusers', backref=db.backref('lists',lazy='dynamic'))
     

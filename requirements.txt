@@ -4,3 +4,6 @@ flask-restful
 flask-security-too
 numpy
 matplotlib
+requests
+redis
+celery[redis]

@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
     <script type="text/JavaScript"> 
          var temp = {{lists|tojson}}
+         var temp2 = {{token|tojson}}
     </script>
 </head>
 <body>
@@ -24,7 +25,6 @@
                 Save changes
             </button>
         </div>
-        <p hidden>${lists}</p>
     </div>
     <main class="row p-3 w-100 text-center">
         <list class="col p-3 border bg-light" v-if="lists_shown.includes(list['listinfo'].ListID)" v-for="list in lists" :id="'list-'+list['listinfo'].ListID">

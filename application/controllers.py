@@ -26,16 +26,17 @@ def dated_url_for(endpoint, **values):
 @app.route('/', methods = ['GET'])
 @login_required
 def userpage():
-    if request.method == 'GET' :
+    if request.method == 'GET':
         curr_user = flask_login.current_user
         UserName = curr_user.username
+        token = curr_user.get_auth_token()
         curr_lists = curr_user.lists.all()
         list_tup={}
         for l in curr_lists:
             cards = {"card-"+str(card.CardID):card.as_dict() for card in l.cards.all()}
             list_tup["list-"+str(l.ListID)]= {'listinfo':l.as_dict(),'cards':cards}
         
-        return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup))
+        return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup), token = token)
 
 @app.route('/addlist', methods=['POST'])
 @login_required

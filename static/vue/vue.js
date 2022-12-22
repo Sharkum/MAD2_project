@@ -56,9 +56,8 @@ var app = new Vue({
         edited:{},
         list_editing:[],
         list_edited:new Set(),
-        auth_token : null,
+        auth_token : temp2,
         interval:null,
-        metrics: JSON.parse(temp),
         reminder_time:new Date(Date.parse(new Date())+1000*60*60*24),
         reminder_message:null,
         reminder_url:null,
@@ -213,14 +212,16 @@ var app = new Vue({
             let tasks_left=0
             for(l in this.lists){
                 let list = this.lists[l]
+                console.log(list)
                 for(c in list.cards){
-                    if(!list.cards[c].Deadline){
-                        tasks_left=task_left+1
+                    if(!list.cards[c].Date_completed){
+                        tasks_left=tasks_left+1
                         break
                     }
                 }
                 if(tasks_left) break
             }
+            console.log(tasks_left)
             if(tasks_left){
                 var response = fetch(this.reminder_url,{method:"POST",body:JSON.stringify({'text':this.reminder_message})})
             }
@@ -283,22 +284,8 @@ var app = new Vue({
     },
     async created(){
 
-        const loggedout = await fetch('http://127.0.0.1:5000/logout')
-        let data = {
-            "email":"sharan342.kumar@gmail.com",
-            "password":"Wiydimam24"
-        }
-        const response = await fetch('http://127.0.0.1:5000/login?include_auth_token',
-                            {headers:{'Content-type': 'application/json'},
-                            method:"POST",
-                            body: JSON.stringify(data)
-                            }).then(response => response.json())
-        this.auth_token = response.response.user.authentication_token;
-
-
         this.interval = setInterval(()=>{
             this.update_all()}, 180000)
-
 
         this.reminder_time=localStorage.getItem('remind_time')
         this.reminder_message=localStorage.getItem('message')
