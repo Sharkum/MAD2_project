@@ -10,6 +10,8 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS = False 
     WTF_CSRF_ENABLED = False
     SECURITY_TOKEN_AUTHENTICATION_HEADER = "Authentication-Token"
+    CELERY_BROKER_URL = "redis://localhost:6379/1"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/2"
 
 class LocalDevelopmentConfig(Config):
     SQLITE_DB_DIR = os.path.join(basedir,"../db_directory")
@@ -22,3 +24,5 @@ class LocalDevelopmentConfig(Config):
     SECURITY_SEND_REGISTER_EMAIL = False
     SECURITY_UNAUTHORIZED_VIEW = None
     SECURITY_USERNAME_ENABLE = True
+    CELERY_BROKER_URL = "redis://localhost:6379/1"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379/2"

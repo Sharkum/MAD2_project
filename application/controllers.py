@@ -64,8 +64,7 @@ def add_card(listid):
         deadline = request.form.get('deadline').replace('T',' ')
         deadline = datetime.datetime.strptime(deadline, "%Y-%m-%d %H:%M")
 
-        new_card = Cards( ListID = listid, \
-                        Date_created = new_datetime.replace(second=0), \
+        new_card = Cards( Date_created = new_datetime.replace(second=0), \
                         Last_modified = datetime.datetime.now().replace(second = 0), \
                         Deadline = deadline.replace(second = 0),\
                         Date_completed = None,\
@@ -86,8 +85,9 @@ def add_card(listid):
 def list_del(listid):
     if request.method == 'POST':
         curr_user = flask_login.current_user
-        Lists.query.filter(Lists.ListID == listid).delete()
-        Cards.query.filter(Cards.ListID == listid).delete()
+        list = Lists.query.filter(Lists.ListID == listid)
+        list.cards.delete()
+        list.delete()
         Listusers.query.filter(Listusers.ListID == listid).delete()
         Cardlists.query.filter(Cardlists.ListID == listid).delete()
         db.session.commit()
@@ -115,4 +115,3 @@ def summarypage():
             }
         print(metrics)
     return render_template('summary.html',name = curr_user.username,metrics=metrics)
-        

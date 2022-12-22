@@ -190,8 +190,7 @@ var app = new Vue({
             const response = fetch('http://127.0.0.1:5000/api/'+cardid+'/delete',{
                 headers:{"Content-type": "application/json",
                         "Authentication-Token":this.auth_token},
-                method:"DELETE",
-                body: {}})
+                method:"DELETE"})
             return
         },
         unset_remind(){
@@ -259,6 +258,20 @@ var app = new Vue({
             }
 
             this.edited[listid].add('card-'+cardid)
+            return
+        },
+        async list_export(listid){
+            var response = fetch('http://127.0.0.1:5000/api/'+listid+'/exportlist',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"GET"})
+            return
+        },
+        async card_export(cardid){
+            var response = fetch('http://127.0.0.1:5000/api/'+cardid+'/exportcard',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"GET"})
             return
         }
     },

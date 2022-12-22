@@ -10,6 +10,9 @@
     <div class="col text-end">
         {% include 'card_add.html' %}
         {% include 'list_delete.html' %}
+        <button @click="list_export(list['listinfo'].ListID)" type="button" class="btn">
+            <i class="fa-solid fa-download"></i>
+        </button>
     </div>
 </div>
 <div v-else class="row p-3">
@@ -21,5 +24,8 @@
     <div class="col text-end">
         {% include 'card_add.html' %}
         {% include 'list_delete.html' %}
+        <button @click="list_export(list['listinfo'].ListID)" type="button" class="btn">
+            <i class="fa-solid fa-download"></i>
+        </button>
     </div>
 </div>

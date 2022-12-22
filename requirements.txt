@@ -7,3 +7,4 @@ matplotlib
 requests
 redis
 celery[redis]
+pandas

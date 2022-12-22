@@ -1,4 +1,5 @@
 from flask import make_response, request
+import pandas as pd
 from flask_restful import Resource, Api, marshal_with, fields
 from .database import db 
 from .models import *
@@ -58,6 +59,13 @@ class UsersAPI(Resource):
 
 class CardsAPI(Resource):
     @auth_token_required
+    def get(self,cardid):
+        card = Cards.query.filter(Cards.CardID == cardid).first()
+        df = pd.DataFrame(card)
+        print(df)
+        return
+        
+    @auth_token_required
     def post(self):
         try:
             curr_user = current_user
@@ -73,7 +81,6 @@ class CardsAPI(Resource):
                     datecomp = datetime.datetime.strptime(card['Date_completed'], "%Y-%m-%dT%H:%M")
                     
                 updatedcard = {
-                    "ListID": card['ListID'],
                     "Date_created":datetime.datetime.strptime(card['Date_created'], "%Y-%m-%dT%H:%M"),
                     "Last_modified":datetime.datetime.strptime(card['Last_modified'], "%Y-%m-%dT%H:%M"),
                     "Deadline":datetime.datetime.strptime(card['Deadline'], "%Y-%m-%dT%H:%M"),
@@ -102,6 +109,13 @@ class CardsAPI(Resource):
         return json.dumps(str(cardid)+" deleted successfuly")
     
 class ListsAPI(Resource):
+    @auth_token_required
+    def get(self,listid):
+        cards = Cards.query.filter(Cardlists.ListID == listid).cards.all()
+        df = pd.DataFrame(cards)
+        print(df)
+        return
+    
     @auth_token_required
     def post(self):
         try:
