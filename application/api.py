@@ -1,12 +1,14 @@
-from flask import make_response, request
+from flask import make_response, request,session
 import pandas as pd
 from flask_restful import Resource, Api, marshal_with, fields
 from .database import db 
 from .models import *
+from .tasks import export_csv
 from werkzeug.exceptions import HTTPException
 import json
 from flask_login import current_user
 from flask_security import auth_token_required
+from .controllers import cache
 
 
 class DefaultError(HTTPException):
@@ -44,25 +46,14 @@ listinfo = {
 
 class UsersAPI(Resource):
     def get(self):
-        try:
-            curr_user = current_user.first()
-        except:
-            raise DefaultError(status_code=500, desc='Internal Server Error ')
-        if curr_user:
-            user_lists = Listusers.query.filter(Listusers.id == curr_user.id).lists.all()
-            if user_lists:
-                return {"Lists": [a.as_dic() for a in user_lists]} 
-            else:
-                raise DefaultError(status_code=404, desc="No Lists found for the given user\n")
-        else:
-            raise DefaultError(status_code=404, desc="User doesn't exist.\n")
+        return json.dumps(cache.get('userid'))
 
 class CardsAPI(Resource):
     @auth_token_required
     def get(self,cardid):
         card = Cards.query.filter(Cards.CardID == cardid).first()
-        df = pd.DataFrame(card)
-        print(df)
+        cards = [card.as_dict()]
+        export_csv.delay(cards,"downloads/cards/card-"+str(cardid)+"_"+card.Last_modified.strftime("%Y-%m-%d_%H:%M")+".csv")
         return
         
     @auth_token_required
@@ -111,9 +102,9 @@ class CardsAPI(Resource):
 class ListsAPI(Resource):
     @auth_token_required
     def get(self,listid):
-        cards = Cards.query.filter(Cardlists.ListID == listid).cards.all()
-        df = pd.DataFrame(cards)
-        print(df)
+        cards = Lists.query.filter(Lists.ListID == listid).first().cards.all()
+        cards = [card.as_dict() for card in cards]
+        export_csv.delay(cards,"downloads/lists/list-"+str(listid)+".csv")
         return
     
     @auth_token_required

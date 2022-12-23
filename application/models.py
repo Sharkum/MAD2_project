@@ -12,7 +12,6 @@ from flask_security.forms import LoginForm
 class Cards(db.Model):
     __tablename__ = 'Cards'
     CardID = db.Column(db.Integer, autoincrement= True, primary_key=True,nullable=False)
-    ListID = db.Column(db.Integer,primary_key=True, nullable=False)
     Date_created = db.Column(db.TIMESTAMP, nullable=False)
     Last_modified = db.Column(db.TIMESTAMP, nullable=False)
     Deadline = db.Column(db.TIMESTAMP,  nullable=False)

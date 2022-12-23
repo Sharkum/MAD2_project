@@ -4,11 +4,13 @@ from distutils.log import Log
 from sqlalchemy import extract,func
 import numpy as np
 import matplotlib.pyplot as plt
-from flask import Flask,request,render_template,redirect, url_for,jsonify
+from flask import Flask,request,render_template,redirect, url_for,jsonify,session
 from flask import current_app as app
 from .models import *
 import flask_login
 from flask_login import login_required
+from flask_caching import Cache
+cache = Cache(app)
 
 # code to prevent the app from loading cached images/data and always load only the supplied data.
 @app.context_processor
@@ -28,6 +30,7 @@ def dated_url_for(endpoint, **values):
 def userpage():
     if request.method == 'GET':
         curr_user = flask_login.current_user
+        cache.set('userid',curr_user.id)
         UserName = curr_user.username
         token = curr_user.get_auth_token()
         curr_lists = curr_user.lists.all()

@@ -26,3 +26,5 @@ class LocalDevelopmentConfig(Config):
     SECURITY_USERNAME_ENABLE = True
     CELERY_BROKER_URL = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND = "redis://localhost:6379/2"
+    CACHE_TYPE = "SimpleCache"
+    CACHE_DEFAULT_TIMEOUT = 300

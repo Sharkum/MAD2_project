@@ -264,14 +264,16 @@ var app = new Vue({
             var response = fetch('http://127.0.0.1:5000/api/'+listid+'/exportlist',{
                 headers:{"Content-type": "application/json",
                         "Authentication-Token":this.auth_token},
-                method:"GET"})
+                method:"GET"
+            })
             return
         },
         async card_export(cardid){
             var response = fetch('http://127.0.0.1:5000/api/'+cardid+'/exportcard',{
                 headers:{"Content-type": "application/json",
                         "Authentication-Token":this.auth_token},
-                method:"GET"})
+                method:"GET"
+            })
             return
         }
     },
@@ -305,11 +307,11 @@ var app = new Vue({
         this.reminder_url=localStorage.getItem('url')
 
 
-        if(this.reminder_time){
-            var timeout = setTimeout(()=>{
-                this.send_reminder();
-            },this.remind_delay)
-        }
+        // if(this.reminder_time){
+        //     var timeout = setTimeout(()=>{
+        //         this.send_reminder();
+        //     },this.remind_delay)
+        // }
 
         for(l in this.lists){
             this.lists_shown.push(this.lists[l]['listinfo']['ListID']);

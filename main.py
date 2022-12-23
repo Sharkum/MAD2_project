@@ -34,7 +34,7 @@ from application.controllers import *
 
 from application.api import UsersAPI,CardsAPI,ListsAPI
 
-api.add_resource(UsersAPI,'/api/getlists')
+api.add_resource(UsersAPI,'/api/getuser')
 api.add_resource(CardsAPI,'/api/<int:cardid>/exportcard','/api/updatecards','/api/<int:cardid>/delete')
 api.add_resource(ListsAPI,'/api/<int:listid>/exportlist','/api/updatelists')
 
