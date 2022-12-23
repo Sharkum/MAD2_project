@@ -24,6 +24,7 @@
                 Save changes
             </button>
         </div>
+        <p hidden>${lists}</p>
     </div>
     <main class="row p-3 w-100 text-center">
         <list class="col p-3 border bg-light" v-if="lists_shown.includes(list['listinfo'].ListID)" v-for="list in lists" :id="'list-'+list['listinfo'].ListID">

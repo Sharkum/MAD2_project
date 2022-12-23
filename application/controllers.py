@@ -36,7 +36,11 @@ def userpage():
         curr_lists = curr_user.lists.all()
         list_tup={}
         for l in curr_lists:
-            cards = {"card-"+str(card.CardID):card.as_dict() for card in l.cards.all()}
+            cards = {}
+            for card in l.cards.all():
+                temp = card.as_dict()
+                temp['ListID'] = l.ListID
+                cards["card-"+str(card.CardID)] = temp
             list_tup["list-"+str(l.ListID)]= {'listinfo':l.as_dict(),'cards':cards}
         
         return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup), token = token)
