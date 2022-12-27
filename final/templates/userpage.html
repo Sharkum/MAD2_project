@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.13/dist/vue.js"></script>
     <script type="text/JavaScript"> 
          var temp = {{lists|tojson}}
+         var temp2 = {{token|tojson}}
     </script>
 </head>
 <body>
@@ -19,7 +20,6 @@
         <h3 class="col text-center">Lists of {{name}}</h3>
         <div class="col text-end">
             {% include 'list_add.html' %}
-            {% include 'reminder.html' %}
             <button @click="update_all()" type="button" class="btn btn-outline-success">
                 Save changes
             </button>

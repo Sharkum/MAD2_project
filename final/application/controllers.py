@@ -4,11 +4,13 @@ from distutils.log import Log
 from sqlalchemy import extract,func
 import numpy as np
 import matplotlib.pyplot as plt
-from flask import Flask,request,render_template,redirect, url_for,jsonify
+from flask import Flask,request,render_template,redirect, url_for,jsonify,session
 from flask import current_app as app
 from .models import *
 import flask_login
 from flask_login import login_required
+from flask_caching import Cache
+cache = Cache(app)
 
 # code to prevent the app from loading cached images/data and always load only the supplied data.
 @app.context_processor
@@ -26,16 +28,22 @@ def dated_url_for(endpoint, **values):
 @app.route('/', methods = ['GET'])
 @login_required
 def userpage():
-    if request.method == 'GET' :
+    if request.method == 'GET':
         curr_user = flask_login.current_user
+        cache.set('userid',curr_user.id)
         UserName = curr_user.username
+        token = curr_user.get_auth_token()
         curr_lists = curr_user.lists.all()
         list_tup={}
         for l in curr_lists:
-            cards = {"card-"+str(card.CardID):card.as_dict() for card in l.cards.all()}
+            cards = {}
+            for card in l.cards.all():
+                temp = card.as_dict()
+                temp['ListID'] = l.ListID
+                cards["card-"+str(card.CardID)] = temp
             list_tup["list-"+str(l.ListID)]= {'listinfo':l.as_dict(),'cards':cards}
         
-        return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup))
+        return render_template('userpage.html',name= UserName, lists = json.dumps(list_tup), token = token)
 
 @app.route('/addlist', methods=['POST'])
 @login_required
@@ -63,8 +71,7 @@ def add_card(listid):
         deadline = request.form.get('deadline').replace('T',' ')
         deadline = datetime.datetime.strptime(deadline, "%Y-%m-%d %H:%M")
 
-        new_card = Cards( ListID = listid, \
-                        Date_created = new_datetime.replace(second=0), \
+        new_card = Cards( Date_created = new_datetime.replace(second=0), \
                         Last_modified = datetime.datetime.now().replace(second = 0), \
                         Deadline = deadline.replace(second = 0),\
                         Date_completed = None,\
@@ -85,8 +92,9 @@ def add_card(listid):
 def list_del(listid):
     if request.method == 'POST':
         curr_user = flask_login.current_user
-        Lists.query.filter(Lists.ListID == listid).delete()
-        Cards.query.filter(Cards.ListID == listid).delete()
+        list = Lists.query.filter(Lists.ListID == listid)
+        list.cards.delete()
+        list.delete()
         Listusers.query.filter(Listusers.ListID == listid).delete()
         Cardlists.query.filter(Cardlists.ListID == listid).delete()
         db.session.commit()
@@ -114,4 +122,3 @@ def summarypage():
             }
         print(metrics)
     return render_template('summary.html',name = curr_user.username,metrics=metrics)
-        

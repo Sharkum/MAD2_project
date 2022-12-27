@@ -56,9 +56,8 @@ var app = new Vue({
         edited:{},
         list_editing:[],
         list_edited:new Set(),
-        auth_token : null,
+        auth_token : temp2,
         interval:null,
-        metrics: JSON.parse(temp),
         reminder_time:new Date(Date.parse(new Date())+1000*60*60*24),
         reminder_message:null,
         reminder_url:null,
@@ -191,8 +190,7 @@ var app = new Vue({
             const response = fetch('http://127.0.0.1:5000/api/'+cardid+'/delete',{
                 headers:{"Content-type": "application/json",
                         "Authentication-Token":this.auth_token},
-                method:"DELETE",
-                body: {}})
+                method:"DELETE"})
             return
         },
         unset_remind(){
@@ -213,14 +211,16 @@ var app = new Vue({
             let tasks_left=0
             for(l in this.lists){
                 let list = this.lists[l]
+                console.log(list)
                 for(c in list.cards){
-                    if(!list.cards[c].Deadline){
-                        tasks_left=task_left+1
+                    if(!list.cards[c].Date_completed){
+                        tasks_left=tasks_left+1
                         break
                     }
                 }
                 if(tasks_left) break
             }
+            console.log(tasks_left)
             if(tasks_left){
                 var response = fetch(this.reminder_url,{method:"POST",body:JSON.stringify({'text':this.reminder_message})})
             }
@@ -259,6 +259,22 @@ var app = new Vue({
 
             this.edited[listid].add('card-'+cardid)
             return
+        },
+        async list_export(listid){
+            var response = fetch('http://127.0.0.1:5000/api/'+listid+'/exportlist',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"GET"
+            })
+            return
+        },
+        async card_export(cardid){
+            var response = fetch('http://127.0.0.1:5000/api/'+cardid+'/exportcard',{
+                headers:{"Content-type": "application/json",
+                        "Authentication-Token":this.auth_token},
+                method:"GET"
+            })
+            return
         }
     },
     computed:{
@@ -283,33 +299,19 @@ var app = new Vue({
     },
     async created(){
 
-        const loggedout = await fetch('http://127.0.0.1:5000/logout')
-        let data = {
-            "email":"sharan342.kumar@gmail.com",
-            "password":"Wiydimam24"
-        }
-        const response = await fetch('http://127.0.0.1:5000/login?include_auth_token',
-                            {headers:{'Content-type': 'application/json'},
-                            method:"POST",
-                            body: JSON.stringify(data)
-                            }).then(response => response.json())
-        this.auth_token = response.response.user.authentication_token;
-
-
         this.interval = setInterval(()=>{
             this.update_all()}, 180000)
-
 
         this.reminder_time=localStorage.getItem('remind_time')
         this.reminder_message=localStorage.getItem('message')
         this.reminder_url=localStorage.getItem('url')
 
 
-        if(this.reminder_time){
-            var timeout = setTimeout(()=>{
-                this.send_reminder();
-            },this.remind_delay)
-        }
+        // if(this.reminder_time){
+        //     var timeout = setTimeout(()=>{
+        //         this.send_reminder();
+        //     },this.remind_delay)
+        // }
 
         for(l in this.lists){
             this.lists_shown.push(this.lists[l]['listinfo']['ListID']);

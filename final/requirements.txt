@@ -2,5 +2,10 @@ Flask
 Flask-SQLAlchemy
 flask-restful
 flask-security-too
+Flask-Caching
 numpy
 matplotlib
+requests
+redis
+celery[redis]
+pandas
