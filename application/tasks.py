@@ -16,7 +16,7 @@ SENDER_PASSOWRD = ""
 
 @celery.on_after_finalize.connect
 def periodic_tasks(sender,**kwargs):
-    sender.add_periodic_task(crontab(hour=12),daily_reminder.s('There are some tasks left to be done.'),)
+    sender.add_periodic_task(crontab(hour=6,minute=19),daily_reminder.s('There are some tasks left to be done.'),)
     
     sender.add_periodic_task(crontab(day_of_month=1),send_email.s())
 

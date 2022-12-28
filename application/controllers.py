@@ -92,11 +92,12 @@ def add_card(listid):
 def list_del(listid):
     if request.method == 'POST':
         curr_user = flask_login.current_user
-        list = Lists.query.filter(Lists.ListID == listid)
-        list.cards.delete()
-        list.delete()
+        Lists.query.filter(Lists.ListID == listid).delete()
+        cardids = Cardlists.query.filter(Cardlists.ListID == listid)
+        for id in cardids.with_entities(Cardlists.CardID).all():
+            Cards.query.filter(Cards.CardID == id[0]).delete()
+        cardids.delete()
         Listusers.query.filter(Listusers.ListID == listid).delete()
-        Cardlists.query.filter(Cardlists.ListID == listid).delete()
         db.session.commit()
         return redirect('/')
       
